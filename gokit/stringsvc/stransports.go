@@ -1,15 +1,17 @@
 package stringsvc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"github.com/go-kit/kit/endpoint"
+	"io/ioutil"
 	"net/http"
 )
 
 func makeUppsercaseEndpoint(svc StringService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(uppsercaseRequest)
+		req := request.(uppercaseRequest)
 		v, err := svc.Uppercase(ctx, req.S)
 		if err != nil {
 			return uppercaseResponse{v, err.Error()}, nil
@@ -27,7 +29,7 @@ func makeCountEndpoint(svc StringService) endpoint.Endpoint {
 }
 
 func decodeUppsercaseRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request uppsercaseRequest
+	var request uppercaseRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -42,11 +44,28 @@ func decodeCountRequest(_ context.Context, r *http.Request) (interface{}, error)
 	return request, nil
 }
 
+func decodeUppercaseResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	var response uppercaseResponse
+	if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
-type uppsercaseRequest struct {
+func encodeRequest(_ context.Context, r *http.Request, request interface{}) error {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(request); err != nil {
+		return err
+	}
+	r.Body = ioutil.NopCloser(&buf)
+	return nil
+}
+
+type uppercaseRequest struct {
 	S string `json:"s"`
 }
 

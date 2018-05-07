@@ -7,7 +7,6 @@ import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	httptransport "github.com/go-kit/kit/transport/http"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"log"
 	"net/http"
 	"os"
 )
@@ -67,7 +66,8 @@ func main() {
 
 	http.Handle("/uppsercase", uppercaseHandler)
 	http.Handle("/count", countHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	logger.Log("msg", "addr", ":8080")
+	logger.Log("err", http.ListenAndServe(":8080", nil))
 
 }
 
