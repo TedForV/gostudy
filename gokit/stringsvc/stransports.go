@@ -10,7 +10,7 @@ import (
 func makeUppsercaseEndpoint(svc StringService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(uppsercaseRequest)
-		v, err := svc.Uppsercase(ctx, req.S)
+		v, err := svc.Uppercase(ctx, req.S)
 		if err != nil {
 			return uppercaseResponse{v, err.Error()}, nil
 		}
